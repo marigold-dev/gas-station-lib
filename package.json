@@ -18,5 +18,15 @@
 		"typescript": "^5.0.0",
 		"vite": "^4.4.2"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+                "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+		"@taquito/beacon-wallet": "^17.2.0",
+		"@taquito/taquito": "^17.2.0",
+		"buffer": "^6.0.3",
+		"events": "^3.3.0",
+		"process": "^0.11.10",
+                "stream-browserify": "^3.0.0",
+		"util": "^0.12.5"
+	}
 }
