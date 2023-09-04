@@ -23,6 +23,7 @@
                 "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
 		"@taquito/beacon-wallet": "^17.2.0",
 		"@taquito/taquito": "^17.2.0",
+		"@picocss/pico": "^1.5.10",
 		"buffer": "^6.0.3",
 		"events": "^3.3.0",
 		"process": "^0.11.10",
