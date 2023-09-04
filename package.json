@@ -20,14 +20,15 @@
 	},
 	"type": "module",
 	"dependencies": {
-                "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
-		"@taquito/beacon-wallet": "^17.2.0",
-		"@taquito/taquito": "^17.2.0",
+		"@airgap/beacon-sdk": "^4.0.9",
+		"@esbuild-plugins/node-globals-polyfill": "^0.2.3",
 		"@picocss/pico": "^1.5.10",
+		"@taquito/beacon-wallet": "^16.2.0",
+		"@taquito/taquito": "^16.2.0",
 		"buffer": "^6.0.3",
 		"events": "^3.3.0",
 		"process": "^0.11.10",
-                "stream-browserify": "^3.0.0",
+		"stream-browserify": "^3.0.0",
 		"util": "^0.12.5"
 	}
 }

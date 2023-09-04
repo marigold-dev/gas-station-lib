@@ -8,3 +8,8 @@
 
 <p>Adresse du contrat = { PUBLIC_PERMIT }</p>
 
+<div>
+  {#if $myAccount == undefined}Connectez-vous pour plus d'information
+  {:else}Vous êtes connecté avec {#await getPKH() then pkh}{pkh}{/await}
+  {/if}
+</div>
