@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Tezos } from "$lib/tezos";
+  import { Tezos, wallet } from "$lib/tezos";
   import * as blake2b from "blake2b";
   import { buf2hex, hex2buf } from "@taquito/utils";
   import { RpcClient } from "@taquito/rpc";
@@ -96,8 +96,12 @@
               parameters: mint_op.parameter
           }
       */
-      console.log(await Tezos.wallet.client);
-      (await Tezos.wallet.client).requestSignPayload({
+      console.log('Tezos.wallet', wallet);
+      //! Ici utilise plutôt l'instance de Beacon plutôt que wallet dans TezosToolkit car
+      // dans le wallet de tezostoolkit tu n'a pas de méthode pour signer (https://tezostaquito.io/typedoc/classes/_taquito_taquito.wallet)
+      // Alors que beacon oui.
+
+      (await wallet.client).requestSignPayload({
           signingType: 'raw',
           payload: permit_hash
       });
