@@ -97,9 +97,6 @@
           }
       */
       console.log('Tezos.wallet', wallet);
-      //! Ici utilise plutôt l'instance de Beacon plutôt que wallet dans TezosToolkit car
-      // dans le wallet de tezostoolkit tu n'a pas de méthode pour signer (https://tezostaquito.io/typedoc/classes/_taquito_taquito.wallet)
-      // Alors que beacon oui.
 
       (await wallet.client).requestSignPayload({
           signingType: 'raw',
