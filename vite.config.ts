@@ -1,4 +1,5 @@
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
+import path from "path";
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
@@ -17,11 +18,12 @@ export default defineConfig({
         },
     },
     resolve: {
-        alias: {
-            process: "process/browser",
+      alias: {
             stream: "stream-browserify",
-            zlib: "browserify-zlib",
+            os: "os-browserify/browser",
             util: "util",
-        },
+            process: "process/browser",
+            buffer: "buffer",
+      },
     },
 });

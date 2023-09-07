@@ -10,25 +10,40 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
+		"@airgap/beacon-types": "^4.0.9",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/kit": "^1.20.4",
 		"svelte": "^4.0.5",
 		"svelte-check": "^3.4.3",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
-		"vite": "^4.4.2"
+		"vite": "^4.3.9"
 	},
 	"type": "module",
 	"dependencies": {
-		"@airgap/beacon-sdk": "^4.0.9",
+		"@airgap/beacon-sdk": "^4.0.4",
 		"@esbuild-plugins/node-globals-polyfill": "^0.2.3",
 		"@picocss/pico": "^1.5.10",
-		"@taquito/beacon-wallet": "^16.2.0",
-		"@taquito/taquito": "^16.2.0",
+		"@taquito/beacon-wallet": "17.3.0",
+		"@taquito/michel-codec": "17.3.0",
+		"@taquito/michelson-encoder": "17.3.0",
+		"@taquito/rpc": "17.3.0",
+		"@taquito/signer": "17.3.0",
+		"@taquito/taquito": "17.3.0",
+		"@taquito/utils": "17.3.0",
+		"assert": "^2.0.0",
+		"blake2b": "^2.1.4",
 		"buffer": "^6.0.3",
+		"crypto-browserify": "^3.12.0",
 		"events": "^3.3.0",
+		"https-browserify": "^1.0.0",
+		"os-browserify": "^0.3.0",
+		"path-browserify": "^1.0.1",
 		"process": "^0.11.10",
 		"stream-browserify": "^3.0.0",
-		"util": "^0.12.5"
+		"stream-http": "^3.2.0",
+		"url": "^0.11.1",
+		"util": "^0.12.5",
+		"vite-compatible-readable-stream": "^3.6.1"
 	}
 }
