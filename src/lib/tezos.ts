@@ -1,4 +1,5 @@
 import { PUBLIC_TEZOS_RPC } from '$env/static/public';
+import { NetworkType } from '@airgap/beacon-sdk';
 import { BeaconWallet } from '@taquito/beacon-wallet';
 import { TezosToolkit } from "@taquito/taquito";
 import { writable } from 'svelte/store';
@@ -7,23 +8,23 @@ export const Tezos = new TezosToolkit(PUBLIC_TEZOS_RPC);
 
 export let myAccount = writable(undefined);
 
-const wallet = new BeaconWallet ({
+export const wallet = new BeaconWallet ({
   name: 'Training',
-  preferredNetwork: 'ghostnet',
+  preferredNetwork: NetworkType.GHOSTNET,
 });
 
 export async function connectWallet() {
   const a = await wallet.requestPermissions({
     network: {
-      type: 'ghostnet',
+      type: NetworkType.GHOSTNET,
       rpcUrl: PUBLIC_TEZOS_RPC,
     }
   });
 
-  console.log(a);
+  console.log(wallet);
   Tezos.setWalletProvider(wallet);
   console.log("foo");
-  console.log(await Tezos.wallet.client);
+  console.log(await wallet.client);
   myAccount.set(await wallet.client.getActiveAccount());
 }
 
