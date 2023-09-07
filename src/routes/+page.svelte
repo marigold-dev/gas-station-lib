@@ -1,15 +1,20 @@
 <script lang="ts">
   import { myAccount, getPKH, Tezos } from "$lib/tezos";
-  import { PUBLIC_PERMIT } from '$env/static/public';
+  import MintingComponent from "$lib/MintingComponent.svelte";
+  import StakingComponent from "$lib/StakingComponent.svelte";
+  import { PUBLIC_PERMIT, PUBLIC_STAKING_CONTRACT } from '$env/static/public';
 </script>
 
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
-
-<p>Adresse du contrat = { PUBLIC_PERMIT }</p>
+<h1>Permit demo</h1>
+<p>Permit contract address: { PUBLIC_PERMIT }</p>
+<p>Staking contract address: { PUBLIC_STAKING_CONTRACT }</p>
 
 <div>
-  {#if $myAccount == undefined}Connectez-vous pour plus d'information
-  {:else}Vous êtes connecté avec {#await getPKH() then pkh}{pkh}{/await}
+  {#if $myAccount == undefined}
+    You're not connected.
+  {:else}{#await getPKH() then pkh}
+    <MintingComponent user_address={"tz1hsvrbDUf8QfzDhjERvZJtDHKyrgqHTugn"} />
+    <StakingComponent user_address={"tz1hsvrbDUf8QfzDhjERvZJtDHKyrgqHTugn"} />
+  {/await}
   {/if}
 </div>

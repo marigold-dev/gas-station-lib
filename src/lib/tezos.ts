@@ -9,20 +9,21 @@ export let myAccount = writable(undefined);
 
 const wallet = new BeaconWallet ({
   name: 'Training',
-  preferredNetwork: 'custom',
+  preferredNetwork: 'ghostnet',
 });
 
 export async function connectWallet() {
   const a = await wallet.requestPermissions({
     network: {
-      type: 'custom',
-      name: "Local node",
-      rpcUrl: "http://localhost:20000",
+      type: 'ghostnet',
+      rpcUrl: PUBLIC_TEZOS_RPC,
     }
   });
 
   console.log(a);
   Tezos.setWalletProvider(wallet);
+  console.log("foo");
+  console.log(await Tezos.wallet.client);
   myAccount.set(await wallet.client.getActiveAccount());
 }
 
