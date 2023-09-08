@@ -52,6 +52,7 @@
           //       display an error message if we didn't wait for long enough
       })();
   }
+
 </script>
 
 <div style="display: flex">
@@ -69,12 +70,13 @@
     {:else}
       {#each fa2_tokens as token, i}
         <div>
-          <img src="{IPFSLinkToHTTPS(token.token.metadata.thumbnailUri)}" /> {token.balance} tokens
-          in your wallet
+          <img src="{IPFSLinkToHTTPS(token.token.metadata.thumbnailUri)}" />
+          <div style="text-align: center; font-size:14px">{token.balance}</div>
         </div>
       {/each}
     {/if}
   {/await}
   </div>
 </div>
+
 

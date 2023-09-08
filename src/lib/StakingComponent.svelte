@@ -171,14 +171,13 @@
     {:else}
       {#each fa2_tokens as token, i}
         <div>
-          <img src="{IPFSLinkToHTTPS(token.token.metadata.thumbnailUri)}" /> {token.balance}
-          tokens staked
+          <img src="{IPFSLinkToHTTPS(token.token.metadata.thumbnailUri)}" />
+          <div style="text-align: center; font-size:14px">{token.balance}</div>
         </div>
       {/each}
     {/if}
   {/await}
   </div>
-
 </div>
 
 
