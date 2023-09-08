@@ -13,8 +13,8 @@
   {#if $myAccount == undefined}
     You're not connected.
   {:else}{#await getPKH() then pkh}
-    <MintingComponent user_address={"tz1hsvrbDUf8QfzDhjERvZJtDHKyrgqHTugn"} />
-    <StakingComponent user_address={"tz1hsvrbDUf8QfzDhjERvZJtDHKyrgqHTugn"} />
+    <MintingComponent user_address={pkh} />
+    <StakingComponent user_address={pkh} />
   {/await}
   {/if}
 </div>

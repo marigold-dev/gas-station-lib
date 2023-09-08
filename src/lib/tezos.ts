@@ -21,10 +21,7 @@ export async function connectWallet() {
     }
   });
 
-  console.log(wallet);
   Tezos.setWalletProvider(wallet);
-  console.log("foo");
-  console.log(await wallet.client);
   myAccount.set(await wallet.client.getActiveAccount());
 }
 

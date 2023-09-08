@@ -69,8 +69,8 @@
     {:else}
       {#each fa2_tokens as token, i}
         <div>
-          <img src="{IPFSLinkToHTTPS(token.token.metadata.thumbnailUri)}" /><br />
-          {token.balance}
+          <img src="{IPFSLinkToHTTPS(token.token.metadata.thumbnailUri)}" /> {token.balance} tokens
+          in your wallet
         </div>
       {/each}
     {/if}
