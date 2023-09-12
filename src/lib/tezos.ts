@@ -36,4 +36,11 @@ export async function getBalance() {
   }
 }
 
+export function subTezos(f) {
+  const sub = Tezos.stream.subscribeBlock('head');
+
+  sub.on('data', f);
+  return sub;
+}
+
 console.log("My tezos library loaded successfully");

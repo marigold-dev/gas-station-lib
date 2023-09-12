@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Tezos, wallet } from "$lib/tezos";
+  import { Tezos, wallet, subTezos } from "$lib/tezos";
   import * as blake2b from "blake2b";
   import { buf2hex, hex2buf } from "@taquito/utils";
   import { RpcClient } from "@taquito/rpc";
@@ -12,6 +12,8 @@
 
   const token_id = 0;
 
+  let user_tokens = [];
+
   function IPFSLinkToHTTPS(url: string) {
     return url.replace("ipfs://", "https://ipfs.io/ipfs/");
   }
@@ -22,7 +24,7 @@
         return response.json();
       })
       .then((fa2_tokens) => {
-        return fa2_tokens;
+        user_tokens = fa2_tokens;
       });
   };
 
@@ -154,6 +156,10 @@
       console.log(response2);
       })();
   }
+
+  subTezos((event) => {
+    get_tokens(PUBLIC_STAKING_CONTRACT)
+  });
 </script>
 
 <div style="display: flex">
@@ -164,19 +170,16 @@
   </div>
 
   <div>
-  {#await get_tokens(PUBLIC_STAKING_CONTRACT)}
-  {:then fa2_tokens}
-    {#if fa2_tokens.length == 0}
+    {#if user_tokens.length == 0}
       <p>You don't have any tokens. Try minting one!</p>
     {:else}
-      {#each fa2_tokens as token, i}
+      {#each user_tokens as token, i}
         <div>
           <img src="{IPFSLinkToHTTPS(token.token.metadata.thumbnailUri)}" />
           <div style="text-align: center; font-size:14px">{token.balance}</div>
         </div>
       {/each}
     {/if}
-  {/await}
   </div>
 </div>
 
