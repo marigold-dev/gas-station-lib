@@ -29,10 +29,15 @@
               token_id: token_id,
               amount_: 1
           }]).toTransferParams()
+          console.log(mint_op);
           const post_content = {
               sender: user_address,
-              contract_address: PUBLIC_PERMIT,
-              parameters: mint_op.parameter
+              operations: [
+                {
+                  destination: mint_op.to,
+                  parameters: mint_op.parameter
+                }
+              ]
           }
           const response = await fetch("http://localhost:8000/operation", {
               method: "POST",

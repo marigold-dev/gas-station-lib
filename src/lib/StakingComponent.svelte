@@ -48,7 +48,7 @@
           "args": [
             {"string": PUBLIC_STAKING_CONTRACT},
             {"int": token_id},
-            {"int": 10}
+            {"int": 1}
           ]
         }]
       ];
@@ -105,19 +105,31 @@
           payload: permit_byts
       })).signature;
       const { publicKey } = await wallet.client.getActiveAccount();
-      console.log(user_address);
-      console.log(signature);
-      console.log(publicKey);
-      console.log(contract);
+
       const permit_op = await contract.methods.permit([[
           publicKey,
           signature,
           transfer_hash
       ]]).toTransferParams();
+
+      const staking_contract = await Tezos.wallet.at(PUBLIC_STAKING_CONTRACT);
+      const staking_op = await staking_contract.methods.stake(
+        1,
+        user_address
+      ).toTransferParams();
+
       const post_content = {
           sender: user_address,
-          contract_address: PUBLIC_PERMIT,
-          parameters: permit_op.parameter
+          operations: [
+            {
+              destination: permit_op.to,
+              parameters: permit_op.parameter
+            },
+            {
+              destination: staking_op.to,
+              parameters: staking_op.parameter
+            }
+          ]
       }
       const response = await fetch("http://localhost:8000/operation", {
           method: "POST",
@@ -130,30 +142,6 @@
           body: JSON.stringify(post_content)
       });
       console.log(response);
-      // console.log(parameterSchema.Encode(transfer_op));
-      // TODO support bulk transactions
-      const staking_contract = await Tezos.wallet.at(PUBLIC_STAKING_CONTRACT);
-      console.log(staking_contract)
-      const staking_op = await staking_contract.methods.stake(
-        10,
-        user_address
-      ).toTransferParams();
-      const post_staking_op = {
-          sender: user_address,
-          contract_address: PUBLIC_STAKING_CONTRACT,
-          parameters: staking_op.parameter
-      }
-      const response2 = await fetch("http://localhost:8000/operation", {
-          method: "POST",
-          mode: "cors",
-          cache: "no-cache",
-          credentials: "same-origin",
-          headers: {
-              "Content-Type": "application/json"
-          },
-          body: JSON.stringify(post_staking_op)
-      });
-      console.log(response2);
       })();
   }
 
