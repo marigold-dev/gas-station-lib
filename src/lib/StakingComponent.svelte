@@ -41,27 +41,15 @@
       const contract = await Tezos.wallet.at(PUBLIC_PERMIT);
       console.log(await contract.storage());
       const counter = (await contract.storage()).extension.counter.c[0];
-      const transfer_data = [
-        {"string": user_address},
-        [{
-          "prim": "Pair",
-          "args": [
-            {"string": PUBLIC_STAKING_CONTRACT},
-            {"int": token_id},
-            {"int": 1}
-          ]
+      const transfer_type = contract.entrypoints.entrypoints.transfer.args[0];
+      const transfer_data = contract.methodsObject.transfer([{
+        from_: user_address,
+        txs: [{
+          to_: PUBLIC_STAKING_CONTRACT,
+          token_id: token_id,
+          amount: 1
         }]
-      ];
-      const transfer_type =
-        {'prim': 'pair',
-         'args': [{'prim': 'address', 'annots': ['%from_']},
-          {'prim': 'list',
-           'annots': ['%txs'],
-           'args': [{'prim': 'pair',
-             'args': [{'prim': 'address', 'annots': ['%to_']},
-              {'prim': 'pair',
-               'args': [{'prim': 'nat', 'annots': ['%token_id']},
-                {'prim': 'nat', 'annots': ['%amount']}]}]}]}]};
+      }]).toTransferParams().parameter.value[0];
       const byts = packDataBytes(transfer_data, transfer_type).bytes;
       const blak = blake2b(32);
       const transfer_hash = blak.update(hex2buf(byts)).digest('hex');
@@ -78,6 +66,8 @@
               {"bytes": transfer_hash}
           ]
       ];
+      // Same as in the Python demo, we cannot use the entrypoint to derive
+      // this object
       const permit_type = {
         'prim': 'pair',
         'args': [
@@ -98,8 +88,6 @@
         ]
       }
       const permit_byts = packDataBytes(permit_data, permit_type).bytes;
-      console.log(permit_byts);
-
       const signature = (await (await wallet.client).requestSignPayload({
           signingType: 'micheline',
           payload: permit_byts
@@ -131,6 +119,7 @@
             }
           ]
       }
+      console.log(post_content);
       const response = await fetch("http://localhost:8000/operation", {
           method: "POST",
           mode: "cors",
@@ -141,8 +130,8 @@
           },
           body: JSON.stringify(post_content)
       });
-      console.log(response);
-      })();
+      console.log(await response.json());
+    })();
   }
 
   subTezos((event) => {
@@ -159,7 +148,7 @@
 
   <div>
     {#if user_tokens.length == 0}
-      <p>You don't have any tokens. Try minting one!</p>
+      <p>You don't have any tokens staked.</p>
     {:else}
       {#each user_tokens as token, i}
         <div>
