@@ -1,10 +1,8 @@
 <script lang="ts">
   import { Tezos, wallet, subTezos } from "$lib/tezos";
-  import * as blake2b from "blake2b";
-  import { buf2hex, hex2buf } from "@taquito/utils";
+  import { GasStation, PermitContract } from "./gas-lib";
   import { RpcClient } from "@taquito/rpc";
   import { InMemorySigner } from "@taquito/signer";
-  import { packDataBytes } from "@taquito/michel-codec";
   import { ParameterSchema } from "@taquito/michelson-encoder";
   import { PUBLIC_PERMIT, PUBLIC_TEZOS_RPC, PUBLIC_STAKING_CONTRACT, PUBLIC_TZKT_API } from '$env/static/public';
 
@@ -36,79 +34,41 @@
     // √ Build the transfer operation
     // √ Send it to the API
     (async () => {
-      const rpc_client = new RpcClient(PUBLIC_TEZOS_RPC, "main");
-      const chain_id = await rpc_client.getChainId();
-      const contract = await Tezos.wallet.at(PUBLIC_PERMIT);
-      console.log(await contract.storage());
-      const counter = (await contract.storage()).extension.counter.c[0];
-      const transfer_type = contract.entrypoints.entrypoints.transfer.args[0];
-      const transfer_data = contract.methodsObject.transfer([{
+      const gas_api = new GasStation({
+        apiURL: "http://localhost:8000/operation"
+      });
+      const permit_contract = new PermitContract(PUBLIC_PERMIT, Tezos);
+
+      const permit_data = await permit_contract.generatePermit({
         from_: user_address,
         txs: [{
           to_: PUBLIC_STAKING_CONTRACT,
           token_id: token_id,
           amount: 1
         }]
-      }]).toTransferParams().parameter.value[0];
-      const byts = packDataBytes(transfer_data, transfer_type).bytes;
-      const blak = blake2b(32);
-      const transfer_hash = blak.update(hex2buf(byts)).digest('hex');
-      console.log(transfer_hash);
-      console.log("Counter is:");
-      console.log(counter);
-      const permit_data = [
-         [
-              {"string": chain_id},
-              {"string": PUBLIC_PERMIT}
-          ],
-          [
-              {"int": counter},
-              {"bytes": transfer_hash}
-          ]
-      ];
-      // Same as in the Python demo, we cannot use the entrypoint to derive
-      // this object
-      const permit_type = {
-        'prim': 'pair',
-        'args': [
-            {
-                'prim': 'pair',
-                'args': [
-                    {'prim': 'chain_id'},
-                    {'prim': 'address'}
-                ]
-            },
-            {
-                'prim': 'pair',
-                'args': [
-                    {'prim': 'int'},
-                    {'prim': 'bytes'}
-                ]
-            }
-        ]
-      }
-      const permit_byts = packDataBytes(permit_data, permit_type).bytes;
+      });
+
       const signature = (await (await wallet.client).requestSignPayload({
           signingType: 'micheline',
-          payload: permit_byts
+          payload: permit_data.bytes
       })).signature;
       const { publicKey } = await wallet.client.getActiveAccount();
 
-      const permit_op = await contract.methods.permit([[
-          publicKey,
-          signature,
-          transfer_hash
-      ]]).toTransferParams();
-
+      const permit_op = await permit_contract.permitCall({
+          publicKey: publicKey,
+          signature: signature,
+          transferHash: permit_data.transfer_hash
+      });
+      console.log(permit_op);
+      console.log("ok");
       const staking_contract = await Tezos.wallet.at(PUBLIC_STAKING_CONTRACT);
       const staking_op = await staking_contract.methods.stake(
         1,
         user_address
       ).toTransferParams();
 
-      const post_content = {
-          sender: user_address,
-          operations: [
+      const response = await gas_api.postOperations(user_address,
+          [
             {
               destination: permit_op.to,
               parameters: permit_op.parameter
@@ -117,20 +77,9 @@
               destination: staking_op.to,
               parameters: staking_op.parameter
             }
-          ]
-      }
-      console.log(post_content);
-      const response = await fetch("http://localhost:8000/operation", {
-          method: "POST",
-          mode: "cors",
-          cache: "no-cache",
-          credentials: "same-origin",
-          headers: {
-              "Content-Type": "application/json"
-          },
-          body: JSON.stringify(post_content)
-      });
-      console.log(await response.json());
+          ]);
+
+      console.log(response);
     })();
   }
 

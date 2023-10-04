@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Tezos, subTezos } from "$lib/tezos";
+  import { GasStation } from "./gas-lib";
   import { PUBLIC_PERMIT, PUBLIC_TZKT_API } from '$env/static/public';
 
   export let user_address;
@@ -24,6 +25,9 @@
 
   function mint(user_address) {
       (async () => {
+          const gas_api = new GasStation({
+            apiURL: "http://localhost:8000/operation"
+          });
           const contract = await Tezos.wallet.at(PUBLIC_PERMIT);
           const mint_op = await contract.methodsObject.mint_token([{
               owner: user_address,
@@ -31,26 +35,11 @@
               amount_: 1
           }]).toTransferParams()
           console.log(mint_op);
-          const post_content = {
-              sender: user_address,
-              operations: [
-                {
-                  destination: mint_op.to,
-                  parameters: mint_op.parameter
-                }
-              ]
-          }
-          const response = await fetch("http://localhost:8000/operation", {
-              method: "POST",
-              mode: "cors",
-              cache: "no-cache",
-              credentials: "same-origin",
-              headers: {
-                  "Content-Type": "application/json"
-              },
-              body: JSON.stringify(post_content)
+          const response = await gas_api.postOperation(user_address, {
+            destination: mint_op.to,
+            parameters: mint_op.parameter
           });
-          console.log(await response.json());
+          console.log(response);
           // √ construct mint operation from Taquito
           // √ jsonize
           // √ const reponse = await fetch("http://127.0.0.1/operation")
