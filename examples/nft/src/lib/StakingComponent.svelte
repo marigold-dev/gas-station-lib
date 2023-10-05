@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Tezos, wallet, subTezos } from "$lib/tezos";
-  import { GasStation, PermitContract } from "./gas-lib";
+  import { GasStation, PermitContract } from "gas-station-lib";
   import { RpcClient } from "@taquito/rpc";
   import { InMemorySigner } from "@taquito/signer";
   import { ParameterSchema } from "@taquito/michelson-encoder";

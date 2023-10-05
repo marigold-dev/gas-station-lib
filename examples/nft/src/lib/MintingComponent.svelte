@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Tezos, subTezos } from "$lib/tezos";
-  import { GasStation } from "./gas-lib";
+  import { GasStation } from "gas-station-lib";
   import { PUBLIC_PERMIT, PUBLIC_TZKT_API } from '$env/static/public';
 
   export let user_address;
