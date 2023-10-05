@@ -1,10 +1,11 @@
 <script lang="ts">
   import { Tezos, wallet, subTezos } from "$lib/tezos";
-  import { GasStation, PermitContract } from "gas-station-lib";
+  import { GasStation, PermitContract } from "@marigold-dev/gas-station-lib";
   import { RpcClient } from "@taquito/rpc";
   import { InMemorySigner } from "@taquito/signer";
   import { ParameterSchema } from "@taquito/michelson-encoder";
-  import { PUBLIC_PERMIT, PUBLIC_TEZOS_RPC, PUBLIC_STAKING_CONTRACT, PUBLIC_TZKT_API } from '$env/static/public';
+  import { PUBLIC_PERMIT, PUBLIC_TEZOS_RPC, PUBLIC_STAKING_CONTRACT, PUBLIC_TZKT_API,
+  PUBLIC_GAS_STATION_API } from '$env/static/public';
 
   export let user_address;
 
@@ -35,7 +36,7 @@
     // √ Send it to the API
     (async () => {
       const gas_api = new GasStation({
-        apiURL: "http://localhost:8000/operation"
+        apiURL: PUBLIC_GAS_STATION_API
       });
       const permit_contract = new PermitContract(PUBLIC_PERMIT, Tezos);
 
