@@ -1,6 +1,6 @@
 {
   "name": "@marigold-dev/gas-station-lib",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Interact with a gas station API and produce TZIP 17 permits",
   "main": "./dist/index.js",
   "files": [

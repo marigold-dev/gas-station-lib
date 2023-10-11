@@ -4,7 +4,7 @@ import { packDataBytes } from "@taquito/michel-codec";
 import * as blake2b from "blake2b";
 import { buf2hex, hex2buf } from "@taquito/utils";
 
-export type Setting = {
+export type Settings = {
   apiURL: string
 };
 
@@ -17,8 +17,8 @@ export type TransferOperation = {
   from_: string,
   txs: [{
     to_: string,
-    token_id: int,
-    amount: int
+    token_id: number,
+    amount: number
   }]
 }
 
@@ -36,7 +36,6 @@ export class GasStation {
   }
 
   async postOperations(sender: string, ops: Array<Operation>) {
-    console.log(ops);
     const post_content = {
       sender: sender,
       operations: ops
@@ -72,10 +71,12 @@ export class PermitContract {
 
   async getCounter() {
     const contract = await this.tezos.wallet.at(this.address);
+    // @ts-ignore
     return (await contract.storage()).extension.counter.c[0];
   }
 
   async generatePermit(transfer: TransferOperation) {
+    // @ts-ignore
     const rpcClient = new RpcClient(this.tezos._rpc, "main");
     const chain_id = await rpcClient.getChainId();
 
@@ -85,6 +86,7 @@ export class PermitContract {
     const transfer_data = contract.methodsObject.transfer([
       transfer
     ]).toTransferParams().parameter.value[0];
+    // @ts-ignore
     const byts = packDataBytes(transfer_data, transfer_type).bytes;
     const blak = blake2b(32);
     const transfer_hash = blak.update(hex2buf(byts)).digest('hex');
@@ -119,6 +121,7 @@ export class PermitContract {
           }
       ]
     };
+    // @ts-ignore
     const permit_bytes = packDataBytes(permit_data, permit_type).bytes;
 
     console.log(permit_bytes);
