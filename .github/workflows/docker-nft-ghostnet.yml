@@ -29,6 +29,13 @@ jobs:
           echo "date=$(date +%Y-%m-%dT%H-%M-%S)" >> "${GITHUB_OUTPUT}"
           echo "sha_short=$(git rev-parse --short HEAD)" >> "${GITHUB_OUTPUT}"
 
+      - name: Replace endpoint
+        id: sed
+        run: |
+          set -x
+          sed -i 's|http://localhost:8000|https://gas-station-api.gcp-npr.marigold.dev|g' /examples/nft/.env
+          cat /examples/nft/.env
+
       - name: Set up Docker Buildx
         uses: docker/Setup-buildx-action@v2
 
