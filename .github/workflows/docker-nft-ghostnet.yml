@@ -33,8 +33,9 @@ jobs:
         id: sed
         run: |
           set -x
-          sed -i 's|http://localhost:8000|https://gas-station-api.gcp-npr.marigold.dev|g' /examples/nft/.env
-          cat /examples/nft/.env
+          ls -last .
+          sed -i 's|http://localhost:8000|https://gas-station-api.gcp-npr.marigold.dev|g' ./examples/nft/.env
+          cat ./examples/nft/.env
 
       - name: Set up Docker Buildx
         uses: docker/Setup-buildx-action@v2
