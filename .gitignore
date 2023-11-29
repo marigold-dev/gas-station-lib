@@ -1,2 +1,4 @@
 /examples/nft/node_modules/
 /examples/nft/.svelte-kit/
+node_modules
+dist

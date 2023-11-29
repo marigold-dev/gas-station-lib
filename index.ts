@@ -1,32 +1,34 @@
 import { TezosToolkit } from "@taquito/taquito";
 import { RpcClient } from "@taquito/rpc";
 import { packDataBytes } from "@taquito/michel-codec";
-import * as blake2b from "blake2b";
-import { buf2hex, hex2buf } from "@taquito/utils";
+import blake2b from "blake2b";
+import { hex2buf } from "@taquito/utils";
 
 export type Settings = {
-  apiURL: string
+  apiURL: string;
 };
 
 export type Operation = {
   destination: string;
   parameters: any;
-}
+};
 
 export type TransferOperation = {
-  from_: string,
-  txs: [{
-    to_: string,
-    token_id: number,
-    amount: number
-  }]
-}
+  from_: string;
+  txs: [
+    {
+      to_: string;
+      token_id: number;
+      amount: number;
+    }
+  ];
+};
 
 export type PermitOperation = {
-  publicKey: string,
-  signature: string,
-  transferHash: string
-}
+  publicKey: string;
+  signature: string;
+  transferHash: string;
+};
 
 export class GasStation {
   url: string;
@@ -37,8 +39,8 @@ export class GasStation {
 
   async postOperations(sender: string, ops: Array<Operation>) {
     const post_content = {
-      sender: sender,
-      operations: ops
+      sender_address: sender,
+      operations: ops,
     };
 
     const response = await fetch(this.url, {
@@ -47,9 +49,9 @@ export class GasStation {
       cache: "no-cache",
       credentials: "same-origin",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(post_content)
+      body: JSON.stringify(post_content),
     });
 
     return await response.json();
@@ -82,63 +84,51 @@ export class PermitContract {
 
     const counter = await this.getCounter();
     const contract = await this.tezos.wallet.at(this.address);
-    const transfer_type = contract.entrypoints.entrypoints.transfer.args[0];
-    const transfer_data = contract.methodsObject.transfer([
-      transfer
-    ]).toTransferParams().parameter.value[0];
+    const transfer_type = contract.entrypoints.entrypoints.transfer.args?.[0];
+    // @ts-ignore
+    const transfer_data = contract.methodsObject
+      .transfer([transfer])
+      .toTransferParams().parameter.value[0];
     // @ts-ignore
     const byts = packDataBytes(transfer_data, transfer_type).bytes;
     const blak = blake2b(32);
-    const transfer_hash = blak.update(hex2buf(byts)).digest('hex');
+    const transfer_hash = blak.update(hex2buf(byts)).digest("hex");
     const permit_data = [
-      [
-        {"string": chain_id},
-        {"string": this.address}
-      ],
-      [
-        {"int": counter},
-        {"bytes": transfer_hash}
-      ]
+      [{ string: chain_id }, { string: this.address }],
+      [{ int: counter }, { bytes: transfer_hash }],
     ];
     // Same as in the Python demo, we cannot use the entrypoint to derive
     // this object
     const permit_type = {
-      'prim': 'pair',
-      'args': [
-          {
-            'prim': 'pair',
-            'args': [
-               {'prim': 'chain_id'},
-               {'prim': 'address'}
-            ]
-          },
-          {
-            'prim': 'pair',
-            'args': [
-              {'prim': 'int'},
-              {'prim': 'bytes'}
-            ]
-          }
-      ]
+      prim: "pair",
+      args: [
+        {
+          prim: "pair",
+          args: [{ prim: "chain_id" }, { prim: "address" }],
+        },
+        {
+          prim: "pair",
+          args: [{ prim: "int" }, { prim: "bytes" }],
+        },
+      ],
     };
     // @ts-ignore
     const permit_bytes = packDataBytes(permit_data, permit_type).bytes;
 
-    console.log(permit_bytes);
-    console.log(transfer_hash);
+    console.info("Permit bytes :", permit_bytes);
+    console.info("Transfert hash : ", transfer_hash);
     return { bytes: permit_bytes, transfer_hash: transfer_hash };
   }
 
   async permitCall(op: PermitOperation) {
     const contract = await this.tezos.wallet.at(this.address);
-    console.log("foo");
-    const call = await contract.methods.permit([[
-      op.publicKey,
-      op.signature,
-      op.transferHash
-    ]]).toTransferParams();
-    console.log("bar");
-    console.log(call);
+
+    const call = await contract.methods
+      .permit([[op.publicKey, op.signature, op.transferHash]])
+      .toTransferParams();
+
+    console.info("Transfert params", call);
+
     return call;
   }
 }
