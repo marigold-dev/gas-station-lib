@@ -6,18 +6,19 @@
   import { ParameterSchema } from "@taquito/michelson-encoder";
   import { PUBLIC_PERMIT, PUBLIC_TEZOS_RPC, PUBLIC_STAKING_CONTRACT, PUBLIC_TZKT_API,
   PUBLIC_GAS_STATION_API } from '$env/static/public';
+  import { SigningType } from "@airgap/beacon-types";
 
-  export let user_address;
+  export let user_address = '';
 
   const token_id = 0;
 
-  let user_tokens = [];
+  let user_tokens: any[] = [];
 
   function IPFSLinkToHTTPS(url: string) {
     return url.replace("ipfs://", "https://ipfs.io/ipfs/");
   }
 
-  function get_tokens(address) {
+  function get_tokens(address: string) {
     return fetch(`${PUBLIC_TZKT_API}/v1/tokens/balances?account=${address}&token.contract=${PUBLIC_PERMIT}&balance.gt=0`)
       .then((response) => {
         return response.json();
@@ -27,7 +28,7 @@
       });
   };
 
-  function stake(user_address) {
+  function stake(user_address: string) {
     // √ Build the transfer
     // √ Build the permit
     // √ Ask to sign the permit
@@ -50,13 +51,17 @@
       });
 
       const signature = (await (await wallet.client).requestSignPayload({
-          signingType: 'micheline',
+          signingType: SigningType.MICHELINE,
           payload: permit_data.bytes
       })).signature;
-      const { publicKey } = await wallet.client.getActiveAccount();
+      const activeAccount = await wallet.client.getActiveAccount();
+
+      if (!activeAccount) {
+        throw new Error('No active account, cannot stake')
+      }
 
       const permit_op = await permit_contract.permitCall({
-          publicKey: publicKey,
+          publicKey: activeAccount.publicKey,
           signature: signature,
           transferHash: permit_data.transfer_hash
       });
@@ -84,14 +89,14 @@
     })();
   }
 
-  subTezos((event) => {
+  subTezos(() => {
     get_tokens(PUBLIC_STAKING_CONTRACT)
   });
 </script>
 
 <div style="display: flex">
   <div>
-    <button on:click={stake(user_address)}>
+    <button on:click={() => stake(user_address)}>
       stake
     </button>
   </div>
@@ -102,7 +107,7 @@
     {:else}
       {#each user_tokens as token, i}
         <div>
-          <img src="{IPFSLinkToHTTPS(token.token.metadata.thumbnailUri)}" />
+          <img src="{IPFSLinkToHTTPS(token.token.metadata.thumbnailUri)}" alt="Token thumnail"/>
           <div style="text-align: center; font-size:14px">{token.balance}</div>
         </div>
       {/each}

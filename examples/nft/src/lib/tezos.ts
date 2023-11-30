@@ -1,15 +1,15 @@
 import { PUBLIC_TEZOS_RPC } from '$env/static/public';
-import { NetworkType } from '@airgap/beacon-sdk';
-import { BeaconWallet } from '@taquito/beacon-wallet';
+import { NetworkType, type AccountInfo } from "@airgap/beacon-sdk";
+import { BeaconWallet } from "@taquito/beacon-wallet";
 import { TezosToolkit } from "@taquito/taquito";
-import { writable } from 'svelte/store';
+import { writable } from "svelte/store";
 
 export const Tezos = new TezosToolkit(PUBLIC_TEZOS_RPC);
 
-export let myAccount = writable(undefined);
+export let myAccount = writable<AccountInfo | undefined>(undefined);
 
-export const wallet = new BeaconWallet ({
-  name: 'Training',
+export const wallet = new BeaconWallet({
+  name: "Training",
   preferredNetwork: NetworkType.GHOSTNET,
 });
 
@@ -18,7 +18,7 @@ export async function connectWallet() {
     network: {
       type: NetworkType.GHOSTNET,
       rpcUrl: PUBLIC_TEZOS_RPC,
-    }
+    },
   });
 
   Tezos.setWalletProvider(wallet);
@@ -30,16 +30,16 @@ export async function getPKH() {
 }
 
 export async function getBalance() {
-  const activeAccount = wallet.client.getActiveAccount();
+  const activeAccount = await wallet.client.getActiveAccount();
   if (activeAccount) {
     return await Tezos.tz.getBalance(activeAccount.address);
   }
 }
 
-export function subTezos(f) {
-  const sub = Tezos.stream.subscribeBlock('head');
+export function subTezos(f: () => void) {
+  const sub = Tezos.stream.subscribeBlock("head");
 
-  sub.on('data', f);
+  sub.on("data", f);
   return sub;
 }
 
