@@ -3,17 +3,17 @@
   import { GasStation } from "@marigold-dev/gas-station-lib";
   import { PUBLIC_PERMIT, PUBLIC_GAS_STATION_API, PUBLIC_TZKT_API } from '$env/static/public';
 
-  export let user_address;
+  export let user_address = '';
 
 
   const token_id = 0;
-  let user_tokens = [];
+  let user_tokens: any[] = [];
 
   function IPFSLinkToHTTPS(url: string) {
     return url.replace("ipfs://", "https://ipfs.io/ipfs/");
   }
 
-  function get_tokens(user_address) {
+  function get_tokens(user_address: string) {
     return fetch(`${PUBLIC_TZKT_API}/v1/tokens/balances?account=${user_address}&token.contract=${PUBLIC_PERMIT}&balance.gt=0`)
       .then((response) => {
         return response.json();
@@ -23,7 +23,7 @@
       });
     };
 
-  function mint(user_address) {
+  function mint(user_address: string) {
       (async () => {
           const gas_api = new GasStation({
             apiURL: PUBLIC_GAS_STATION_API
@@ -49,14 +49,14 @@
       })();
   }
 
-  subTezos((event) => {
+  subTezos(() => {
     get_tokens(user_address)
   });
 </script>
 
 <div style="display: flex">
   <div>
-    <button on:click={mint(user_address)}>
+    <button on:click={() => mint(user_address)}>
       mint
     </button>
   </div>
@@ -67,7 +67,7 @@
     {:else}
       {#each user_tokens as token, i}
         <div>
-          <img src="{IPFSLinkToHTTPS(token.token.metadata.thumbnailUri)}" />
+          <img src="{IPFSLinkToHTTPS(token.token.metadata.thumbnailUri)}" alt="Token thumnail"/>
           <div style="text-align: center; font-size:14px">{token.balance}</div>
         </div>
       {/each}
