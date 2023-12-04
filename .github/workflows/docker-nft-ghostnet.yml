@@ -35,6 +35,8 @@ jobs:
           set -x
           ls -last .
           sed -i 's|http://localhost:8000|https://gas-station-api.gcp-npr.marigold.dev|g' ./examples/nft/.env
+          sed -i 's|KT1Re88VMEJ7TLHTkXSHQYZQTD3MP3k7j6Ar|KT1S39ScgeLfuHggJnx697ik8DnLpqZsPb2V|g' ./examples/nft/.env
+          sed -i 's|KT1Rp1rgfwS25XrWU6fUnR8cw6KMZBhDvXdq|KT1E9pTL48tGuAUvRMiyEDKocKW1S2Rgc7Hs|g' ./examples/nft/.env
           cat ./examples/nft/.env
 
       - name: Set up Docker Buildx
