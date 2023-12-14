@@ -1,4 +1,4 @@
-name: Docker ghostnet staging
+name: Docker nft ghostnet staging
 
 on:
   push:
