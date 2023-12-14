@@ -3,14 +3,15 @@ name: Docker nft ghostnet
 on:
   push:
     branches:
-      - 'release-ghostnet'
-      - 'main' # Remove this line when we want more controlled releases
+      - 'release-ghostnet' # to remove
   pull_request:
     branches:
-      - 'release-ghostnet'
+      - 'release-ghostnet' # to remove
     types:
       - closed
-  workflow_dispatch:
+  repository_dispatch:
+      types: [from-release-coord-repo]
+  workflow_dispatch: # to remove
 
 jobs:
   ui:
@@ -23,6 +24,14 @@ jobs:
         with:
           submodules: true
 
+      - if: github.event_name == 'repository_dispatch'
+        run: |
+            VERSION=${{ toJson(github.event.client_payload.version) }}
+            echo "VERSION=-$VERSION" >> $GITHUB_ENV
+            echo "Pipeline has been triggered through HTTP. Setting version to $VERSION."
+        env:
+          VERSION: ${{ toJson(github.event.client_payload.version) }}
+
       - name: Set outputs
         id: vars
         run: |
@@ -34,7 +43,7 @@ jobs:
         run: |
           set -x
           ls -last .
-          sed -i 's|http://localhost:8000|https://gas-station-api.gcp-npr.marigold.dev|g' ./examples/nft/.env
+          sed -i 's|http://localhost:8000|https://ghostnet.gas-station-api.marigold.dev|g' ./examples/nft/.env
           sed -i 's|KT1Re88VMEJ7TLHTkXSHQYZQTD3MP3k7j6Ar|KT199yuNkHQKpy331A6fvWJtQ1uan9uya2jx|g' ./examples/nft/.env
           sed -i 's|KT1Rp1rgfwS25XrWU6fUnR8cw6KMZBhDvXdq|KT1MLMXwFEMcfByGbGcQ9ow3nsrQCkLbcRAu|g' ./examples/nft/.env
           cat ./examples/nft/.env
@@ -49,15 +58,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push release version
+      - name: Build and push version
         uses: docker/build-push-action@v3
         with:
           file: ./examples/nft/Dockerfile.${{ matrix.network }}
           context: ./examples/nft/
           push: true
           tags: |
-            ghcr.io/marigold-dev/gas-station-nft-${{ matrix.network }}:stable
-            ghcr.io/marigold-dev/gas-station-nft-${{ matrix.network }}:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-release
+            ghcr.io/marigold-dev/gas-station-nft-${{ matrix.network }}:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-release${{ env.VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
