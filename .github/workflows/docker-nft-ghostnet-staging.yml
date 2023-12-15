@@ -28,6 +28,16 @@ jobs:
           echo "date=$(date +%Y-%m-%dT%H-%M-%S)" >> "${GITHUB_OUTPUT}"
           echo "sha_short=$(git rev-parse --short HEAD)" >> "${GITHUB_OUTPUT}"
 
+      - name: Replace endpoint
+        id: sed
+        run: |
+          set -x
+          ls -last .
+          sed -i 's|http://localhost:8000|https://staging.gas-station-api.marigold.dev|g' ./examples/nft/.env
+          sed -i 's|KT1Re88VMEJ7TLHTkXSHQYZQTD3MP3k7j6Ar|KT199yuNkHQKpy331A6fvWJtQ1uan9uya2jx|g' ./examples/nft/.env
+          sed -i 's|KT1Rp1rgfwS25XrWU6fUnR8cw6KMZBhDvXdq|KT1MLMXwFEMcfByGbGcQ9ow3nsrQCkLbcRAu|g' ./examples/nft/.env
+          cat ./examples/nft/.env
+
       - name: Set up Docker Buildx
         uses: docker/Setup-buildx-action@v2
 
@@ -41,10 +51,11 @@ jobs:
       - name: Build and push version
         uses: docker/build-push-action@v3
         with:
-          file: ./Dockerfile.${{ matrix.network }}
-          context: ./
+          file: ./examples/nft/Dockerfile.${{ matrix.network }}
+          context: ./examples/nft/
           push: true
           tags: |
             ghcr.io/marigold-dev/gas-station-nft-${{ matrix.network }}:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-staging
           cache-from: type=gha
           cache-to: type=gha,mode=max
+

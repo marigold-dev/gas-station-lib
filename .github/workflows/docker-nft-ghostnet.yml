@@ -1,17 +1,8 @@
 name: Docker nft ghostnet
 
 on:
-  push:
-    branches:
-      - 'release-ghostnet' # to remove
-  pull_request:
-    branches:
-      - 'release-ghostnet' # to remove
-    types:
-      - closed
   repository_dispatch:
       types: [from-release-coord-repo]
-  workflow_dispatch: # to remove
 
 jobs:
   ui:
