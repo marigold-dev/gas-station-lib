@@ -21,7 +21,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@marigold-dev/gas-station-lib": "^0.0.4",
+		"@marigold-dev/gas-station-lib": "^0.0.6",
 		"@airgap/beacon-sdk": "^4.0.4",
 		"@esbuild-plugins/node-globals-polyfill": "^0.2.3",
 		"@picocss/pico": "^1.5.10",

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Tezos, subTezos } from "$lib/tezos";
-  import { GasStation } from "@marigold-dev/gas-station-lib";
-  import { PUBLIC_PERMIT, PUBLIC_GAS_STATION_API, PUBLIC_TZKT_API } from '$env/static/public';
+  import { GasStation, GAS_STATION_PUBLIC_API_GHOSTNET } from "@marigold-dev/gas-station-lib";
+  import { PUBLIC_PERMIT, PUBLIC_TZKT_API } from '$env/static/public';
 
   export let user_address = '';
 
@@ -26,7 +26,7 @@
   function mint(user_address: string) {
       (async () => {
           const gas_api = new GasStation({
-            apiURL: PUBLIC_GAS_STATION_API
+            apiURL: GAS_STATION_PUBLIC_API_GHOSTNET
           });
           const contract = await Tezos.wallet.at(PUBLIC_PERMIT);
           const mint_op = await contract.methodsObject.mint_token([{
