@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Tezos, wallet, subTezos } from "$lib/tezos";
   import { GasStation, PermitContract, GAS_STATION_PUBLIC_API_GHOSTNET } from "@marigold-dev/gas-station-lib";
-  import { PUBLIC_PERMIT, PUBLIC_STAKING_CONTRACT, PUBLIC_TZKT_API } from '$env/static/public';
+  import { PUBLIC_GAS_STATION_API, PUBLIC_PERMIT, PUBLIC_STAKING_CONTRACT, PUBLIC_TZKT_API } from '$env/static/public';
   import { SigningType } from "@airgap/beacon-types";
 
   export let user_address = '';
@@ -33,7 +33,7 @@
     // √ Send it to the API
     (async () => {
       const gas_api = new GasStation({
-        apiURL: GAS_STATION_PUBLIC_API_GHOSTNET
+        apiURL: PUBLIC_GAS_STATION_API
       });
       const permit_contract = new PermitContract(PUBLIC_PERMIT, Tezos);
 
