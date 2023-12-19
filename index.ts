@@ -30,11 +30,21 @@ export type PermitOperation = {
   transferHash: string;
 };
 
+export const GAS_STATION_PUBLIC_API_GHOSTNET =
+  "https://ghostnet.gas-station-api.marigold.dev/operation";
+export const GAS_STATION_PUBLIC_API_MAINNET =
+  "https://gas-station-api.marigold.dev/operation";
+
 export class GasStation {
   url: string;
 
-  constructor(settings: Settings) {
-    this.url = settings.apiURL;
+  /**
+   *
+   * @param settings (optional) object
+   *   - apiURL: the URL of Gas Station API. /!\ For this version, the URL must redirect to the endpoint /operation
+   */
+  constructor(settings?: Settings) {
+    this.url = settings?.apiURL || GAS_STATION_PUBLIC_API_GHOSTNET;
   }
 
   async postOperations(sender: string, ops: Array<Operation>) {
@@ -61,6 +71,8 @@ export class GasStation {
     return this.postOperations(sender, [op]);
   }
 }
+
+const g = new GasStation();
 
 export class PermitContract {
   address: string;
