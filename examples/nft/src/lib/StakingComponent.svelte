@@ -93,7 +93,7 @@
 <div style="display: flex">
   <div>
     <button on:click={() => stake(user_address)}>
-      stake
+      stash
     </button>
   </div>
 
