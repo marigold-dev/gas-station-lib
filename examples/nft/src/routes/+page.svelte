@@ -5,17 +5,25 @@
   import { PUBLIC_PERMIT, PUBLIC_STAKING_CONTRACT } from '$env/static/public';
 </script>
 
-<h1>Permit demo</h1>
+<h1>Gas station demo</h1>
+
+<p>This simple dApp can be used by a user having no ꜩ in their wallet, with operations being relayed
+  by the Gas Station. <emph>Minting</emph> a new NFT is done by a single call to the smart contract.
+  However, <emph>stashing</emph> an NFT to another smart contract requires a transfer, which must be
+  authorized off-chain through the signature of a permit.</p>
+
 <div>
   {#if $myAccount == undefined}
-    You're not connected.
+    <p>Please connect to use the dApp.</p>
   {:else}{#await getPKH() then pkh}
     <section>
       <h2>NFTs in your wallet</h2>
+      <p>{PUBLIC_PERMIT}</p>
       <MintingComponent user_address={pkh} />
     </section>
     <section>
-      <h2>Staked NFTs</h2>
+      <h2>Stashed NFTs</h2>
+      <p>{PUBLIC_STAKING_CONTRACT}</p>
       <StakingComponent user_address={pkh} />
     </section>
   {/await}
@@ -61,6 +69,6 @@
   }
 
   p {
-    font-size: 16px;
+    font-size: 18px;
   }
 </style>
