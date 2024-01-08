@@ -31,9 +31,9 @@ export type PermitOperation = {
 };
 
 export const GAS_STATION_PUBLIC_API_GHOSTNET =
-  "https://ghostnet.gas-station-api.marigold.dev/operation";
+  "https://ghostnet.gas-station-api.marigold.dev";
 export const GAS_STATION_PUBLIC_API_MAINNET =
-  "https://gas-station-api.marigold.dev/operation";
+  "https://gas-station-api.marigold.dev";
 
 export class GasStation {
   url: string;
@@ -53,7 +53,7 @@ export class GasStation {
       operations: ops,
     };
 
-    const response = await fetch(this.url, {
+    const response = await fetch(`${this.url}/operation`, {
       method: "POST",
       mode: "cors",
       cache: "no-cache",
@@ -71,8 +71,6 @@ export class GasStation {
     return this.postOperations(sender, [op]);
   }
 }
-
-const g = new GasStation();
 
 export class PermitContract {
   address: string;
