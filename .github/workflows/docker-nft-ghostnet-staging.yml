@@ -34,7 +34,6 @@ jobs:
           set -x
           ls -last .
           sed -i 's|http://localhost:8000|https://staging.gas-station-api.marigold.dev|g' ./examples/nft/.env
-          sed -i 's|KT1Re88VMEJ7TLHTkXSHQYZQTD3MP3k7j6Ar|KT1CvtrTV7snJSxdnQqhSqh47tyVYhm4ACGB|g' ./examples/nft/.env
           sed -i 's|KT1Rp1rgfwS25XrWU6fUnR8cw6KMZBhDvXdq|KT1K9X6QpuTWFX4S5ieDGTUdjAHQtiFRH5op|g' ./examples/nft/.env
           cat ./examples/nft/.env
 
