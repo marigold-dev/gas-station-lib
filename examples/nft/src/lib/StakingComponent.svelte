@@ -53,7 +53,7 @@
       const activeAccount = await wallet.client.getActiveAccount();
 
       if (!activeAccount) {
-        throw new Error('No active account, cannot stake')
+        throw new Error('No active account, cannot stash.')
       }
 
       const permit_op = await permit_contract.permitCall({
@@ -64,8 +64,9 @@
       console.log(permit_op);
       console.log("ok");
       const staking_contract = await Tezos.wallet.at(PUBLIC_STAKING_CONTRACT);
-      const staking_op = await staking_contract.methods.stake(
+      const staking_op = await staking_contract.methods.stash(
         1,
+        token_id,
         user_address
       ).toTransferParams();
 
@@ -92,14 +93,14 @@
 
 <div style="display: flex">
   <div>
-    <button on:click={() => stake(user_address)}>
+    <button on:click={() => stash(user_address)}>
       stash
     </button>
   </div>
 
   <div>
     {#if user_tokens.length == 0}
-      <p>You don't have any tokens staked.</p>
+      <p>You don't have any tokens stashed.</p>
     {:else}
       {#each user_tokens as token, i}
         <div>
