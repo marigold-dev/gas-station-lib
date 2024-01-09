@@ -3,6 +3,9 @@
   import MintingComponent from "$lib/MintingComponent.svelte";
   import StakingComponent from "$lib/StakingComponent.svelte";
   import { PUBLIC_PERMIT, PUBLIC_STAKING_CONTRACT } from '$env/static/public';
+
+  // Shared between the two components
+  let available_token_ids;
 </script>
 
 <h1>Gas station demo</h1>
@@ -19,12 +22,12 @@
     <section>
       <h2>NFTs in your wallet</h2>
       <p>{PUBLIC_PERMIT}</p>
-      <MintingComponent user_address={pkh} />
+      <MintingComponent user_address={pkh} bind:available_token_ids />
     </section>
     <section>
       <h2>Stashed NFTs</h2>
       <p>{PUBLIC_STAKING_CONTRACT}</p>
-      <StakingComponent user_address={pkh} />
+      <StakingComponent user_address={pkh} bind:available_token_ids />
     </section>
   {/await}
   {/if}

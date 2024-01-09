@@ -5,8 +5,7 @@
   import { SigningType } from "@airgap/beacon-types";
 
   export let user_address = '';
-
-  const token_id = 0;
+  export let available_token_ids = new Set<string>();
 
   let user_tokens: any[] = [];
 
@@ -24,7 +23,12 @@
       });
   };
 
-  function stake(user_address: string) {
+  function stash(user_address: string) {
+    const n = available_token_ids?.size;
+    if (n === 0) {
+      return;
+    }
+    const token_id = [...available_token_ids][Math.floor(Math.random() * n)];
     // √ Build the transfer
     // √ Build the permit
     // √ Ask to sign the permit
@@ -89,8 +93,9 @@
   subTezos(() => {
     get_tokens(PUBLIC_STAKING_CONTRACT)
   });
-</script>
 
+  $: console.log(available_token_ids);
+</script>
 <div style="display: flex">
   <div>
     <button on:click={() => stash(user_address)}>

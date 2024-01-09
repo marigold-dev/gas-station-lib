@@ -4,10 +4,13 @@
   import { PUBLIC_GAS_STATION_API, PUBLIC_PERMIT, PUBLIC_TZKT_API } from '$env/static/public';
 
   export let user_address = '';
+  export let available_token_ids = new Set<string>(); // to be shared with StakingComponent
 
-
-  const token_id = 0;
   let user_tokens: any[] = [];
+
+  function randomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
 
   function IPFSLinkToHTTPS(url: string) {
     return url.replace("ipfs://", "https://ipfs.io/ipfs/");
@@ -24,6 +27,7 @@
     };
 
   function mint(user_address: string) {
+    const token_id = randomInt(6);
       (async () => {
           const gas_api = new GasStation({
             apiURL: PUBLIC_GAS_STATION_API
@@ -52,6 +56,9 @@
   subTezos(() => {
     get_tokens(user_address)
   });
+
+  // Maintain the set of available token IDs to pick one in the stash operation
+  $: available_token_ids = new Set(user_tokens.map(token => token.token.tokenId));
 </script>
 
 <div style="display: flex">
