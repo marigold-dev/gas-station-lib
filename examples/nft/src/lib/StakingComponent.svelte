@@ -5,8 +5,7 @@
   import { SigningType } from "@airgap/beacon-types";
 
   export let user_address = '';
-
-  const token_id = 0;
+  export let available_token_ids = new Set<string>();
 
   let user_tokens: any[] = [];
 
@@ -24,7 +23,12 @@
       });
   };
 
-  function stake(user_address: string) {
+  function stash(user_address: string) {
+    const n = available_token_ids?.size;
+    if (n === 0) {
+      return;
+    }
+    const token_id = [...available_token_ids][Math.floor(Math.random() * n)];
     // √ Build the transfer
     // √ Build the permit
     // √ Ask to sign the permit
@@ -53,7 +57,7 @@
       const activeAccount = await wallet.client.getActiveAccount();
 
       if (!activeAccount) {
-        throw new Error('No active account, cannot stake')
+        throw new Error('No active account, cannot stash.')
       }
 
       const permit_op = await permit_contract.permitCall({
@@ -64,8 +68,9 @@
       console.log(permit_op);
       console.log("ok");
       const staking_contract = await Tezos.wallet.at(PUBLIC_STAKING_CONTRACT);
-      const staking_op = await staking_contract.methods.stake(
+      const staking_op = await staking_contract.methods.stash(
         1,
+        token_id,
         user_address
       ).toTransferParams();
 
@@ -88,25 +93,30 @@
   subTezos(() => {
     get_tokens(PUBLIC_STAKING_CONTRACT)
   });
-</script>
 
+  $: console.log(available_token_ids);
+</script>
 <div style="display: flex">
   <div>
-    <button on:click={() => stake(user_address)}>
-      stake
+    <button on:click={() => stash(user_address)}>
+      stash
     </button>
   </div>
 
   <div>
     {#if user_tokens.length == 0}
-      <p>You don't have any tokens staked.</p>
+      <p>You don't have any tokens stashed.</p>
     {:else}
-      {#each user_tokens as token, i}
-        <div>
-          <img src="{IPFSLinkToHTTPS(token.token.metadata.thumbnailUri)}" alt="Token thumnail"/>
-          <div style="text-align: center; font-size:14px">{token.balance}</div>
-        </div>
-      {/each}
+      <div style="display:flex;align-items:center;justify-content:center;">
+        {#each user_tokens as token, i}
+          <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;">
+            {#if Object.hasOwn(token.token, "metadata")}
+              <img src="{IPFSLinkToHTTPS(token.token.metadata.thumbnailUri)}" alt="Token thumnail"/>
+              <div style="text-align: center; font-size:14px">{token.balance}</div>
+            {/if}
+          </div>
+        {/each}
+      </div>
     {/if}
   </div>
 </div>
