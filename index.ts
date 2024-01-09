@@ -126,7 +126,7 @@ export class PermitContract {
     const permit_bytes = packDataBytes(permit_data, permit_type).bytes;
 
     console.info("Permit bytes :", permit_bytes);
-    console.info("Transfert hash : ", transfer_hash);
+    console.info("Transfer hash : ", transfer_hash);
     return { bytes: permit_bytes, transfer_hash: transfer_hash };
   }
 
@@ -137,7 +137,7 @@ export class PermitContract {
       .permit([[op.publicKey, op.signature, op.transferHash]])
       .toTransferParams();
 
-    console.info("Transfert params", call);
+    console.info("Transfer params", call);
 
     return call;
   }
