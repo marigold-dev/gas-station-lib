@@ -107,12 +107,16 @@
     {#if user_tokens.length == 0}
       <p>You don't have any tokens stashed.</p>
     {:else}
-      {#each user_tokens as token, i}
-        <div>
-          <img src="{IPFSLinkToHTTPS(token.token.metadata.thumbnailUri)}" alt="Token thumnail"/>
-          <div style="text-align: center; font-size:14px">{token.balance}</div>
-        </div>
-      {/each}
+      <div style="display:flex;align-items:center;justify-content:center;">
+        {#each user_tokens as token, i}
+          <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;">
+            {#if Object.hasOwn(token.token, "metadata")}
+              <img src="{IPFSLinkToHTTPS(token.token.metadata.thumbnailUri)}" alt="Token thumnail"/>
+              <div style="text-align: center; font-size:14px">{token.balance}</div>
+            {/if}
+          </div>
+        {/each}
+      </div>
     {/if}
   </div>
 </div>
