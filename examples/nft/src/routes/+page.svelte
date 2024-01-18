@@ -2,43 +2,50 @@
   import { myAccount, getPKH, Tezos } from "$lib/tezos";
   import MintingComponent from "$lib/MintingComponent.svelte";
   import StakingComponent from "$lib/StakingComponent.svelte";
-  import { PUBLIC_PERMIT, PUBLIC_STAKING_CONTRACT } from '$env/static/public';
+  import { PUBLIC_PERMIT, PUBLIC_STAKING_CONTRACT } from "$env/static/public";
 
   // Shared between the two components
   let available_token_ids;
 </script>
 
-<h1>Gas station demo</h1>
+<main>
+  <h1>Gas Station Demo</h1>
 
-<p>This simple dApp can be used by a user having no ꜩ in their wallet, with operations being relayed
-  by the Gas Station. <emph>Minting</emph> a new NFT is done by a single call to the smart contract.
-  However, <emph>stashing</emph> an NFT to another smart contract requires a transfer, which must be
-  authorized off-chain through the signature of a permit.</p>
+  <p>
+    This user-friendly dApp is tailored for individuals without any ꜩ in their
+    wallets. Operations are seamlessly relayed through the Gas Station.
+  </p>
 
-<div>
-  {#if $myAccount == undefined}
-    <p>Please connect to use the dApp.</p>
-  {:else}{#await getPKH() then pkh}
-    <section>
-      <h2>NFTs in your wallet</h2>
-      <p>{PUBLIC_PERMIT}</p>
-      <MintingComponent user_address={pkh} bind:available_token_ids />
-    </section>
-    <section>
-      <h2>Stashed NFTs</h2>
-      <p>{PUBLIC_STAKING_CONTRACT}</p>
-      <StakingComponent user_address={pkh} bind:available_token_ids />
-    </section>
-  {/await}
-  {/if}
-</div>
+  <p>
+    <empt>Minting</empt> a new NFT is achieved with a single call to the smart
+    contract. However, <empt>stashing</empt> an NFT to another smart contract requires
+    a transfer, which must be authorized off-chain through the signature of a permit.
+  </p>
+
+  <div>
+    {#if $myAccount === undefined}
+      <p>Please connect to use the dApp.</p>
+    {:else}{#await getPKH() then pkh}
+        <section>
+          <h2>NFTs in your wallet</h2>
+          <p>{PUBLIC_PERMIT}</p>
+          <MintingComponent user_address={pkh} bind:available_token_ids />
+        </section>
+        <section>
+          <h2>Stashed NFTs</h2>
+          <p>{PUBLIC_STAKING_CONTRACT}</p>
+          <StakingComponent user_address={pkh} bind:available_token_ids />
+        </section>
+      {/await}
+    {/if}
+  </div>
+</main>
 
 <style>
   main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
     margin-top: 20px;
   }
 
@@ -73,5 +80,16 @@
 
   p {
     font-size: 18px;
+  }
+
+  .progress-bar {
+    background-color: #eee; /* Light gray background for the progress bar */
+    border: 1px solid #ccc; /* Border for the progress bar */
+    border-radius: 4px; /* Rounded corners */
+  }
+
+  .progress-bar-fill {
+    background-color: #0074cc; /* Color for the filled part of the progress bar */
+    height: 100%; /* Fill the entire height of the progress bar */
   }
 </style>
