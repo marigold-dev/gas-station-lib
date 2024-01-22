@@ -66,16 +66,12 @@
           ])
           .toTransferParams();
 
-        console.log(mint_op);
-
         mintingProgress = 50; // Set progress to 50% after Taquito operation
 
         const response = await gas_api.postOperation(user_address, {
           destination: mint_op.to,
           parameters: mint_op.parameter,
         });
-
-        console.log(response);
 
         mintingProgress = 100; // Set progress to 100% after gas station operation
       } catch (error) {
