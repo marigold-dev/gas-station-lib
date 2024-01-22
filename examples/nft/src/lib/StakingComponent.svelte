@@ -13,15 +13,31 @@
   } from "$env/static/public";
   import { SigningType } from "@airgap/beacon-types";
 
+  /**
+   * [user_address] stores the user's address
+   */
   export let user_address = "";
+
+  /**
+   * [available_token_ids] a set of available token IDs
+   *
+   */
   export let available_token_ids = new Set<string>();
 
   let user_tokens: any[] = [];
 
+  /**
+   * Convert an IPFS to HTTPS
+   * @param url
+   */
   function IPFSLinkToHTTPS(url: string) {
     return url.replace("ipfs://", "https://ipfs.io/ipfs/");
   }
 
+  /**
+   * Fetch and store the user's token balances based on their address
+   * @param address
+   */
   function get_tokens(address: string) {
     return fetch(
       `${PUBLIC_TZKT_API}/v1/tokens/balances?account=${address}&token.contract=${PUBLIC_PERMIT}&balance.gt=0`,
@@ -34,11 +50,23 @@
       });
   }
 
+  // Add progress bar for stashing
+  let isStashing = true;
+  let stashProgress = 0;
+
+  /**
+   * [stash] function responsible for performing the "stash" operation,
+   * which involves creating a permit for transferring a token to a staking
+   * contract and sending it to the API.
+   * @param user_address
+   */
   function stash(user_address: string) {
     const n = available_token_ids?.size;
     if (n === 0) {
       return;
     }
+
+    // Randomly selects a token ID from available tokens;
     const token_id = [...available_token_ids][Math.floor(Math.random() * n)];
     // √ Build the transfer
     // √ Build the permit
@@ -47,56 +75,86 @@
     // √ Build the transfer operation
     // √ Send it to the API
     (async () => {
-      const gas_api = new GasStation({
-        apiURL: PUBLIC_GAS_STATION_API,
-      });
-      const permit_contract = new PermitContract(PUBLIC_PERMIT, Tezos);
+      isStashing = true;
 
-      const permit_data = await permit_contract.generatePermit({
-        from_: user_address,
-        txs: [
+      try {
+        // Initializes a Gas Station instance using the provided API URL
+        const gas_api = new GasStation({
+          apiURL: PUBLIC_GAS_STATION_API,
+        });
+
+        // Initializes a PermitContract instance using the public permit address and the
+        // Tezos object
+        const permit_contract = new PermitContract(PUBLIC_PERMIT, Tezos);
+
+        // Generate permit data for the transfer operation. Specifies the sender,
+        // receiver (staking contract), token ID, and amount
+        const permit_data = await permit_contract.generatePermit({
+          from_: user_address,
+          txs: [
+            {
+              to_: PUBLIC_STAKING_CONTRACT,
+              token_id: token_id,
+              amount: 1,
+            },
+          ],
+        });
+
+        // Request signature for permit
+        const signature = (
+          await (
+            await wallet.client
+          ).requestSignPayload({
+            signingType: SigningType.MICHELINE,
+            payload: permit_data.bytes,
+          })
+        ).signature;
+        const activeAccount = await wallet.client.getActiveAccount();
+
+        if (!activeAccount) {
+          throw new Error("No active account, cannot stash.");
+        }
+
+        // Permit call and staking contract operation
+        const permit_op = await permit_contract.permitCall({
+          publicKey: activeAccount.publicKey,
+          signature: signature,
+          transferHash: permit_data.transfer_hash,
+        });
+
+        // Get the staking contract instance
+        const staking_contract = await Tezos.wallet.at(PUBLIC_STAKING_CONTRACT);
+
+        // Build a transfer operation for stashing the token in the staking contract
+        const staking_op = await staking_contract.methods
+          .stash(1, token_id, user_address)
+          .toTransferParams();
+
+        stashProgress = 50;
+
+        // Post Operations to Gas Station API
+        const response = await gas_api.postOperations(user_address, [
           {
-            to_: PUBLIC_STAKING_CONTRACT,
-            token_id: token_id,
-            amount: 1,
+            destination: permit_op.to,
+            parameters: permit_op.parameter,
           },
-        ],
-      });
+          {
+            destination: staking_op.to,
+            parameters: staking_op.parameter,
+          },
+        ]);
 
-      const signature = (
-        await (
-          await wallet.client
-        ).requestSignPayload({
-          signingType: SigningType.MICHELINE,
-          payload: permit_data.bytes,
-        })
-      ).signature;
-      const activeAccount = await wallet.client.getActiveAccount();
-
-      if (!activeAccount) {
-        throw new Error("No active account, cannot stash.");
+        stashProgress = 100;
+      } catch (error) {
+        console.error("Stashing failed:", error);
+        console.error("URL being fetched:", PUBLIC_GAS_STATION_API);
+        stashProgress = 0;
+      } finally {
+        // Introduce a short delay before setting isStashing to false
+        // to give Svelte time to update the UI
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        isStashing = false;
       }
-
-      const permit_op = await permit_contract.permitCall({
-        publicKey: activeAccount.publicKey,
-        signature: signature,
-        transferHash: permit_data.transfer_hash,
-      });
-      const staking_contract = await Tezos.wallet.at(PUBLIC_STAKING_CONTRACT);
-      const staking_op = await staking_contract.methods
-        .stash(1, token_id, user_address)
-        .toTransferParams();
-
-      const response = await gas_api.postOperations(user_address, [
-        {
-          destination: permit_op.to,
-          parameters: permit_op.parameter,
-        },
-        {
-          destination: staking_op.to,
-          parameters: staking_op.parameter,
-        },
-      ]);
     })();
   }
 
@@ -107,7 +165,15 @@
 
 <div style="display: flex">
   <div>
-    <button on:click={() => stash(user_address)}> stash </button>
+    <!-- Stash Button with Progress Bar -->
+    <button on:click={() => stash(user_address)}>
+      {isStashing ? "Stashing..." : "Stash"}
+      {#if isStashing}
+        <div class="progress-bar">
+          <div class="progress-bar-fill" style="width: {stashProgress}%"></div>
+        </div>
+      {/if}
+    </button>
   </div>
 
   <div>
