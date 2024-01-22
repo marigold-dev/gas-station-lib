@@ -17,7 +17,7 @@
 
   /*** Generate a random integer up to a given maximum value.
    *   It uses to generate a random token ID when minting. */
-  function randomInt(max) {
+  function randomInt(max: number) {
     return Math.floor(Math.random() * max);
   }
 
@@ -138,3 +138,17 @@
     {/if}
   </div>
 </div>
+
+<style>
+  .progress-bar {
+      background-color: #eee; /* Light gray background for the progress bar */
+      border: 1px solid #ccc; /* Border for the progress bar */
+      border-radius: 15px; /* Rounded corners */
+      height: 10px;
+    }
+
+  .progress-bar-fill {
+      background-color: #0074cc; /* Color for the filled part of the progress bar */
+      height: 100%; /* Fill the entire height of the progress bar */
+    }
+</style>

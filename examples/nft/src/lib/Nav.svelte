@@ -1,7 +1,7 @@
 <script lang="ts">
   import { myAccount, connectWallet, getPKH } from '$lib/tezos';
 
-  function truncate_address(str) {
+  function truncate_address(str: string) {
     if (str.length > 25) {
       return str.substr(0, 10) + '...' + str.substr(str.length-5, str.length);
     }
