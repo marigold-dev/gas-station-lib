@@ -81,15 +81,4 @@
   p {
     font-size: 18px;
   }
-
-  .progress-bar {
-    background-color: #eee; /* Light gray background for the progress bar */
-    border: 1px solid #ccc; /* Border for the progress bar */
-    border-radius: 4px; /* Rounded corners */
-  }
-
-  .progress-bar-fill {
-    background-color: #0074cc; /* Color for the filled part of the progress bar */
-    height: 100%; /* Fill the entire height of the progress bar */
-  }
 </style>

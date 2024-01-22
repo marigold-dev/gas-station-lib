@@ -51,7 +51,7 @@
   }
 
   // Add progress bar for stashing
-  let isStashing = true;
+  let isStashing = false;
   let stashProgress = 0;
 
   /**
@@ -94,7 +94,7 @@
           txs: [
             {
               to_: PUBLIC_STAKING_CONTRACT,
-              token_id: token_id,
+              token_id: parseInt(token_id, 10),
               amount: 1,
             },
           ],
@@ -168,12 +168,12 @@
     <!-- Stash Button with Progress Bar -->
     <button on:click={() => stash(user_address)}>
       {isStashing ? "Stashing..." : "Stash"}
+    </button>
       {#if isStashing}
         <div class="progress-bar">
           <div class="progress-bar-fill" style="width: {stashProgress}%"></div>
         </div>
       {/if}
-    </button>
   </div>
 
   <div>
@@ -200,3 +200,17 @@
     {/if}
   </div>
 </div>
+
+<style>
+  .progress-bar {
+      background-color: #eee; /* Light gray background for the progress bar */
+      border: 1px solid #ccc; /* Border for the progress bar */
+      border-radius: 15px; /* Rounded corners */
+      height: 10px;
+    }
+
+  .progress-bar-fill {
+      background-color: #0074cc; /* Color for the filled part of the progress bar */
+      height: 100%; /* Fill the entire height of the progress bar */
+    }
+</style>
